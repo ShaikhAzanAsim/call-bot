@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     vapi_voice_provider: str = "vapi"
     vapi_voice_id: str = "Elliot"
     public_base_url: str = ""
+    render_external_url: str = ""
     draft_resume_hours: int = 24
     census_timeout_seconds: float = 1.5
     simulate_db_write_failure: bool = False
@@ -33,6 +34,11 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.app_env.lower() == "production"
+
+    @property
+    def public_origin(self) -> str:
+        """Public https origin. Render injects RENDER_EXTERNAL_URL when PUBLIC_BASE_URL is unset."""
+        return (self.public_base_url or self.render_external_url).rstrip("/")
 
     @property
     def sqlite(self) -> bool:

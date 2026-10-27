@@ -13,6 +13,14 @@ services:
         value: "true"
       - key: PYTHONUNBUFFERED
         value: "1"
+      - key: VAPI_MODEL
+        value: gpt-4o-mini
+      - key: VAPI_VOICE_PROVIDER
+        value: vapi
+      - key: VAPI_VOICE_ID
+        value: Elliot
+      - key: VAPI_WEBHOOK_SECRET
+        generateValue: true
     disk:
       name: patient-data
       mountPath: /data

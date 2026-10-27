@@ -1,6 +1,6 @@
 # Voice patient registration
 
-**Phone number to call:** not provisioned yet. A Vapi account and a U.S. number are required. See [What I need from you](#what-i-need-from-you).
+**Phone number to call:** +1 520-654-9005
 
 **API base URL:** not deployed yet. Local: `http://127.0.0.1:8000`
 
@@ -96,8 +96,8 @@ VAPI_VOICE_ID=Elliot
 
 Checked against [Vapi server events](https://docs.vapi.ai/server-url/events) and [custom tools](https://docs.vapi.ai/tools/custom-tools).
 
-1. Create a Vapi account and buy one U.S. number. This costs money, so it is not done in the repo.
-2. In Vapi, add an OpenAI key or enable Vapi's own model billing so `gpt-4o-mini` can run.
+1. The review number is +1 520-654-9005. It is a free inbound Vapi number. Calls still spend Vapi credits.
+2. Leave Vapi on its own model billing for `gpt-4o-mini`. Do not attach an OpenAI key with a zero balance. The built-in voice `Elliot` needs no extra vendor key.
 3. Set the phone number's server URL to `https://<host>/voice/webhook`.
 4. Create a Bearer credential whose header name is `X-Vapi-Secret`, bearer prefix off, token equal to `VAPI_WEBHOOK_SECRET`. Attach it to that server URL. Saved resources get the header. A transient assistant pasted into an API call often does not.
 5. Leave the phone number **without** an assistant id. Vapi then sends `assistant-request`. This server answers within a local database lookup (the platform limit is 7.5 seconds) with a transient assistant: the prompt from this repo, the tools below, voice `Elliot`, Deepgram `nova-2` with `language: multi`, and `silenceTimeoutSeconds: 30`.
@@ -254,10 +254,7 @@ This repository was built with Cursor. The PDF allows that. I can explain every 
 
 ## What I need from you
 
-I will not create accounts, buy a number, or invent keys.
+The review number is +1 520-654-9005. Do not put an OpenAI key in this repo. A key with no credits cannot run `gpt-4o-mini`. Leave model billing on the Vapi account.
 
-1. A Vapi account (or an API key) and approval to buy one U.S. number.
-2. A host that does not sleep: Railway, Render, or Fly, with a persistent disk (or a Postgres URL).
-3. The OpenAI key is entered in Vapi, not in this repo, unless you also want the LLM eval (`EVAL_LLM_API_KEY`).
-
-When those exist I can deploy, point the webhook at `/voice/webhook`, and put the live number and base URL at the top of this file.
+1. A Render account that can run a Starter web service with a 1 GB disk. The free instance sleeps and cannot keep the SQLite file.
+2. After the host is live, copy `VAPI_WEBHOOK_SECRET` from the Render environment into a Vapi credential named `X-Vapi-Secret`, and set the phone number server URL to `https://<host>/voice/webhook` with no assistant attached.

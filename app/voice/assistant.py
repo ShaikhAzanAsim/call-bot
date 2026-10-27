@@ -216,7 +216,7 @@ def _context_block(context: dict) -> str:
 
 
 def _server_url(settings: Settings) -> str:
-    base = (settings.public_base_url or "").rstrip("/")
+    base = settings.public_origin
     if not base:
         return ""
     return f"{base}/voice/webhook"
