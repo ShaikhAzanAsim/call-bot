@@ -1,0 +1,11 @@
+id: hangup_midcall
+description: Ending the call before save leaves no patient and marks the session abandoned.
+caller_number: "2065550112"
+checks: [abandoned, not_saved]
+steps:
+  - tool: record_field
+    args: {field: first_name, spoken_value: Sam}
+    expect: {ok: true}
+  - tool: end_call
+    args: {}
+    expect: {ok: true, end_call: true}

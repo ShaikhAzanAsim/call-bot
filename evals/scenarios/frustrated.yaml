@@ -1,0 +1,14 @@
+id: frustrated
+description: Three bad phone attempts escalate the repair step to 3.
+caller_number: "2065550117"
+checks: [repair_escalated, not_saved]
+steps:
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "12"}
+    expect: {ok: false, repair_step: 1}
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "1235550199"}
+    expect: {ok: false, repair_step: 2}
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "999"}
+    expect: {ok: false, repair_step: 3}

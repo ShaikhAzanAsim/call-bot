@@ -1,0 +1,5 @@
+id: silence
+description: Repeated silence is a platform behavior. This scenario checks the assistant contract, not audio.
+caller_number: "2065550121"
+checks: [silence_contract, not_saved]
+steps: []

@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: voice-patient-registration
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        value: sqlite:////data/patients.db
+      - key: SEED_ON_STARTUP
+        value: "true"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    disk:
+      name: patient-data
+      mountPath: /data
+      sizeGB: 1

@@ -1,0 +1,38 @@
+id: returning_update
+description: A phone match offers an update, and the save changes the existing row.
+caller_number: "2065550110"
+setup_patient:
+  first_name: Jane
+  last_name: Doe
+  date_of_birth: "03/15/1985"
+  sex: Female
+  phone_number: "2065550110"
+  address_line_1: 1 Old Road
+  city: Seattle
+  state: WA
+  zip_code: "98101"
+ground_truth:
+  first_name: Jane
+  last_name: Doe
+  city: Bellevue
+  phone_number: "2065550110"
+checks: [updated_not_duplicated]
+steps:
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "2065550110"}
+    expect: {ok: true}
+  - tool: choose_duplicate_action
+    args: {action: update}
+    expect: {ok: true, mode: update}
+  - tool: record_field
+    args: {field: city, spoken_value: Bellevue}
+    expect: {ok: true, normalized_value: Bellevue}
+  - tool: get_draft
+    args: {}
+    expect: {ready_to_confirm: true}
+  - tool: confirm_registration
+    args: {}
+    expect: {ok: true}
+  - tool: save_patient
+    args: {}
+    expect: {ok: true}

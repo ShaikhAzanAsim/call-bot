@@ -1,0 +1,8 @@
+id: zip_mismatch
+description: A Texas ZIP with a Washington state is flagged before any geocoder call matters.
+caller_number: "5125550106"
+checks: [not_saved]
+steps:
+  - tool: check_address
+    args: {line1: "1 Congress Ave", city: Austin, state: WA, zip: "78701"}
+    expect: {ok: false}

@@ -1,0 +1,55 @@
+id: spoken_email
+description: Spoken punctuation becomes a real email and is spelled back on request.
+caller_number: "2065550118"
+ground_truth:
+  first_name: John
+  last_name: Smith
+  date_of_birth: "01/15/1980"
+  sex: Male
+  phone_number: "2065550118"
+  email: john.smith@gmail.com
+  address_line_1: 4 Elm Street
+  city: Seattle
+  state: WA
+  zip_code: "98101"
+checks: [saved, matches_ground_truth]
+steps:
+  - tool: record_field
+    args: {field: email, spoken_value: "john dot smith at gmail dot com"}
+    expect: {ok: true, normalized_value: john.smith@gmail.com}
+  - tool: record_field
+    args: {field: first_name, spoken_value: John}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: last_name, spoken_value: Smith}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: date_of_birth, spoken_value: "January 15, 1980"}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: sex, spoken_value: male}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "2065550118"}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: address_line_1, spoken_value: "4 Elm Street"}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: city, spoken_value: Seattle}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: state, spoken_value: WA}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: zip_code, spoken_value: "98101"}
+    expect: {ok: true}
+  - tool: get_draft
+    args: {}
+    expect: {ready_to_confirm: true}
+  - tool: confirm_registration
+    args: {}
+    expect: {ok: true}
+  - tool: save_patient
+    args: {}
+    expect: {ok: true}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Intake desk</title>
+  <style>
+    :root {
+      --ink: #1c1915;
+      --muted: #5c564c;
+      --line: #e4ddd2;
+      --paper: #f6f1e8;
+      --card: #fffdf8;
+      --good: #1f7a4d;
+      --bad: #9c2f2f;
+      --accent: #0f6e6b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 16px/1.45 "Segoe UI", Georgia, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    header, main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    header { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; }
+    h1 { font-size: 28px; margin: 0; letter-spacing: -0.03em; }
+    h2 { font-size: 18px; margin: 0 0 12px; }
+    a { color: var(--accent); }
+    .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .field { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+    .ok { color: var(--good); }
+    .bad { color: var(--bad); }
+    .muted { color: var(--muted); }
+    .pill { display: inline-block; border-radius: 999px; padding: 2px 8px; background: #efe7da; font-size: 12px; }
+    #timeline { font-family: ui-monospace, Consolas, monospace; font-size: 12px; white-space: pre-wrap; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Intake desk</h1>
+      <p class="muted">Fake patients only. Live calls fill the form as each field is accepted or rejected.</p>
+    </div>
+    <a href="/docs">API docs</a>
+  </header>
+  <main class="grid">
+    <section class="card">
+      <h2>Patients</h2>
+      <table>
+        <thead><tr><th>Name</th><th>DOB</th><th>Phone</th><th>City</th></tr></thead>
+        <tbody id="patients"></tbody>
+      </table>
+    </section>
+    <section class="card">
+      <h2>Live call <span id="call-status" class="pill">idle</span></h2>
+      <p id="call-meta" class="muted">Waiting for a call.</p>
+      <div id="fields"></div>
+      <h2 style="margin-top:18px">Flight recorder</h2>
+      <div id="timeline" class="muted">No events yet.</div>
+    </section>
+  </main>
+  <script>
+    const fieldsEl = document.querySelector("#fields");
+    const patientsEl = document.querySelector("#patients");
+    const timelineEl = document.querySelector("#timeline");
+    const statusEl = document.querySelector("#call-status");
+    const metaEl = document.querySelector("#call-meta");
+    const focus = new URLSearchParams(location.hash.slice(1)).get("call") || (location.hash.match(/call=([^&]+)/) || [])[1];
+    let activeId = focus || null;
+
+    function renderDraft(draft, events) {
+      const collected = (draft && draft.fields) || {};
+      const failed = {};
+      (events || []).forEach((event) => {
+        if (event.type === "validation_failed" && event.payload) failed[event.payload.field] = event.payload;
+      });
+      const names = Object.keys({...collected, ...failed});
+      fieldsEl.innerHTML = names.map((name) => {
+        if (failed[name] && collected[name] == null) {
+          return `<div class="field"><span>${name.replaceAll("_", " ")}</span><span class="bad">rejected · step ${failed[name].repair_step}</span></div>`;
+        }
+        return `<div class="field"><span>${name.replaceAll("_", " ")}</span><span class="ok">${collected[name] || ""}</span></div>`;
+      }).join("") || `<p class="muted">No fields yet.</p>`;
+    }
+
+    async function loadPatients() {
+      const response = await fetch("/patients");
+      const body = await response.json();
+      patientsEl.innerHTML = (body.data || []).map((row) =>
+        `<tr><td>${row.first_name} ${row.last_name}</td><td>${row.date_of_birth}</td><td>${row.phone_number}</td><td>${row.city}, ${row.state}</td></tr>`
+      ).join("") || `<tr><td colspan="4" class="muted">No patients yet.</td></tr>`;
+    }
+
+    async function loadCall(callId) {
+      const response = await fetch(`/calls/${callId}`);
+      if (!response.ok) return;
+      const body = await response.json();
+      const call = body.data;
+      activeId = call.call_id;
+      statusEl.textContent = call.status;
+      metaEl.textContent = `${call.call_id} · ${call.caller_number || "unknown caller"}${call.summary ? " · " + call.summary : ""}`;
+      renderDraft(call.draft, call.events);
+      timelineEl.textContent = (call.events || []).map((event) =>
+        `${event.ts}  ${event.type}  ${JSON.stringify(event.payload)}`
+      ).join("\n") || "No events yet.";
+    }
+
+    async function pickCall() {
+      if (activeId) return loadCall(activeId);
+      const response = await fetch("/calls/active");
+      const body = await response.json();
+      if (body.data && body.data[0]) return loadCall(body.data[0].call_id);
+    }
+
+    const source = new EventSource("/events");
+    source.onmessage = (message) => {
+      const event = JSON.parse(message.data);
+      if (!activeId) activeId = event.call_id;
+      if (event.call_id === activeId) loadCall(activeId);
+      if (event.type === "save_success") loadPatients();
+    };
+    loadPatients();
+    pickCall();
+    setInterval(pickCall, 4000);
+  </script>
+</body>
+</html>

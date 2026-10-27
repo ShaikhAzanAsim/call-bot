@@ -1,0 +1,58 @@
+id: spanish
+description: Preferred language is stored as Spanish when the caller asks for it.
+caller_number: "3055550109"
+ground_truth:
+  first_name: Lucia
+  last_name: Alvarez
+  date_of_birth: "08/08/1993"
+  sex: Female
+  phone_number: "3055550109"
+  address_line_1: 50 Ocean Drive
+  city: Miami
+  state: FL
+  zip_code: "33101"
+  preferred_language: Spanish
+checks: [saved, matches_ground_truth]
+steps:
+  - tool: record_field
+    args: {field: preferred_language, spoken_value: "Hablo español"}
+    expect: {ok: true, normalized_value: Spanish}
+  - tool: record_field
+    args: {field: first_name, spoken_value: Lucia}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: last_name, spoken_value: Alvarez}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: date_of_birth, spoken_value: "08/08/1993"}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: sex, spoken_value: mujer}
+    expect: {ok: false}
+  - tool: record_field
+    args: {field: sex, spoken_value: female}
+    expect: {ok: true, normalized_value: Female}
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "3055550109"}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: address_line_1, spoken_value: "50 Ocean Drive"}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: city, spoken_value: Miami}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: state, spoken_value: Florida}
+    expect: {ok: true, normalized_value: FL}
+  - tool: record_field
+    args: {field: zip_code, spoken_value: "33101"}
+    expect: {ok: true}
+  - tool: get_draft
+    args: {}
+    expect: {ready_to_confirm: true}
+  - tool: confirm_registration
+    args: {}
+    expect: {ok: true}
+  - tool: save_patient
+    args: {}
+    expect: {ok: true}

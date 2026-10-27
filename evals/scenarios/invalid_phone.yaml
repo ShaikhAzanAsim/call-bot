@@ -1,0 +1,14 @@
+id: invalid_phone
+description: Nine digits, an area code starting with 1, and a 3-digit fragment are each rejected, and the repair step climbs.
+caller_number: "4155550105"
+checks: [reprompted_phone_number, not_saved]
+steps:
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "415555010"}
+    expect: {ok: false, repair_step: 1}
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "1235550100"}
+    expect: {ok: false, repair_step: 2}
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "555"}
+    expect: {ok: false, repair_step: 3}

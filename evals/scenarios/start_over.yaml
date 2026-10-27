@@ -1,0 +1,60 @@
+id: start_over
+description: Start over clears the draft, then a new registration can be saved.
+caller_number: "2065550113"
+ground_truth:
+  first_name: Nina
+  last_name: Cole
+  date_of_birth: "05/05/1990"
+  sex: Female
+  phone_number: "2065550113"
+  address_line_1: 9 Pine Street
+  city: Seattle
+  state: WA
+  zip_code: "98101"
+checks: [saved, matches_ground_truth]
+steps:
+  - tool: record_field
+    args: {field: first_name, spoken_value: Wrong}
+    expect: {ok: true}
+  - tool: reset_draft
+    args: {scope: all}
+    expect: {ok: true}
+  - tool: get_draft
+    args: {}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: first_name, spoken_value: Nina}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: last_name, spoken_value: Cole}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: date_of_birth, spoken_value: "05/05/1990"}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: sex, spoken_value: female}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "2065550113"}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: address_line_1, spoken_value: "9 Pine Street"}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: city, spoken_value: Seattle}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: state, spoken_value: WA}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: zip_code, spoken_value: "98101"}
+    expect: {ok: true}
+  - tool: get_draft
+    args: {}
+    expect: {ready_to_confirm: true}
+  - tool: confirm_registration
+    args: {}
+    expect: {ok: true}
+  - tool: save_patient
+    args: {}
+    expect: {ok: true}

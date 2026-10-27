@@ -1,0 +1,16 @@
+id: resume_dropped
+description: An abandoned draft is offered on the next call from the same number.
+caller_number: "2065550111"
+prior_call:
+  id: resume-dropped-prior
+  fields:
+    first_name: Ada
+    last_name: Lovelace
+checks: [resumed_fields, not_saved]
+steps:
+  - tool: lookup_caller
+    args: {}
+    expect: {ok: true}
+  - tool: get_draft
+    args: {}
+    expect: {ok: true}

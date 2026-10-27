@@ -1,0 +1,54 @@
+id: cooperative
+description: A clear caller gives every required field in order and confirms.
+caller_number: "2065550101"
+ground_truth:
+  first_name: Maria
+  last_name: Lopez
+  date_of_birth: "03/05/1992"
+  sex: Female
+  phone_number: "2065550101"
+  address_line_1: 410 Pike Street
+  city: Seattle
+  state: WA
+  zip_code: "98101"
+checks: [saved, matches_ground_truth, no_save_before_confirm]
+steps:
+  - tool: record_field
+    args: {field: first_name, spoken_value: Maria}
+    expect: {ok: true, normalized_value: Maria}
+  - tool: record_field
+    args: {field: last_name, spoken_value: Lopez}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: date_of_birth, spoken_value: "March fifth, nineteen ninety-two"}
+    expect: {ok: true, normalized_value: "03/05/1992"}
+  - tool: record_field
+    args: {field: sex, spoken_value: woman}
+    expect: {ok: true, normalized_value: Female}
+  - tool: record_field
+    args: {field: phone_number, spoken_value: "206 555 0101"}
+    expect: {ok: true, normalized_value: "2065550101"}
+  - tool: record_field
+    args: {field: address_line_1, spoken_value: "410 Pike Street"}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: city, spoken_value: Seattle}
+    expect: {ok: true}
+  - tool: record_field
+    args: {field: state, spoken_value: Washington}
+    expect: {ok: true, normalized_value: WA}
+  - tool: record_field
+    args: {field: zip_code, spoken_value: "nine eight one oh one"}
+    expect: {ok: true, normalized_value: "98101"}
+  - tool: save_patient
+    args: {}
+    expect: {ok: false}
+  - tool: get_draft
+    args: {}
+    expect: {ok: true, ready_to_confirm: true}
+  - tool: confirm_registration
+    args: {}
+    expect: {ok: true}
+  - tool: save_patient
+    args: {}
+    expect: {ok: true}

@@ -1,0 +1,8 @@
+id: impossible_date
+description: February 30 is rejected with a day-specific reason.
+caller_number: "2065550122"
+checks: [not_saved]
+steps:
+  - tool: record_field
+    args: {field: date_of_birth, spoken_value: "February 30, 1992"}
+    expect: {ok: false, repair_step: 1}
