@@ -2,9 +2,11 @@
 
 **Phone number to call:** +1 520-654-9005
 
-**API base URL:** not deployed yet. Local: `http://127.0.0.1:8000`
+**API base URL:** https://voice-patient-registration-yxaj.onrender.com
 
-**Dashboard:** `http://127.0.0.1:8000/dashboard` (same path on the deployed host)
+**Dashboard:** https://voice-patient-registration-yxaj.onrender.com/dashboard
+
+Local: `http://127.0.0.1:8000` and `http://127.0.0.1:8000/dashboard`
 
 **Test notes:** No API key. The API is open on purpose. Do not put real patients in it. Seed records, once the app starts with `SEED_ON_STARTUP=true`:
 
@@ -77,7 +79,7 @@ python scripts/smoke_test.py http://127.0.0.1:8000
 
 ### Deploy
 
-Railway (`railway.toml`) or Render (`render.yaml`). Use a paid instance so the process does not sleep. Mount a volume at `/data` and set:
+The live host is a Render free web service: https://voice-patient-registration-yxaj.onrender.com. It costs $0. It sleeps after about 15 minutes without a request, and the SQLite file is wiped on sleep or redeploy. `SEED_ON_STARTUP=true` puts Jane Doe and Carlos Rivera back on the next boot. Open `/health` and wait until it returns before a review call, because Vapi needs a webhook answer within 7.5 seconds. `render.yaml` in this working copy is `plan: free` with no disk. The copy on GitHub may still say `starter` until that file is pushed. Do not apply that paid Blueprint.
 
 ```
 APP_ENV=production
@@ -90,7 +92,7 @@ VAPI_VOICE_PROVIDER=vapi
 VAPI_VOICE_ID=Elliot
 ```
 
-`/health` is the health check. If a host still sleeps, hit `/health` every few minutes from an external cron. Do not use a free sleeping web dyno for the review call.
+`/health` is the health check. A paid Starter instance plus a 1 GB disk would stay awake and keep the database. That is about $7.25 per month. This deployment stays on the free instance.
 
 ### Voice platform
 
@@ -256,5 +258,5 @@ This repository was built with Cursor. The PDF allows that. I can explain every 
 
 The review number is +1 520-654-9005. Do not put an OpenAI key in this repo. A key with no credits cannot run `gpt-4o-mini`. Leave model billing on the Vapi account.
 
-1. A Render account that can run a Starter web service with a 1 GB disk. The free instance sleeps and cannot keep the SQLite file.
-2. After the host is live, copy `VAPI_WEBHOOK_SECRET` from the Render environment into a Vapi credential named `X-Vapi-Secret`, and set the phone number server URL to `https://<host>/voice/webhook` with no assistant attached.
+1. The free Render service is live. Wake it with `/health` before calling, and expect saved patients other than the two seed records to disappear after the instance sleeps.
+2. Copy `VAPI_WEBHOOK_SECRET` from the Render environment into a Vapi credential named `X-Vapi-Secret`, and set the phone number server URL to `https://voice-patient-registration-yxaj.onrender.com/voice/webhook` with no assistant attached.

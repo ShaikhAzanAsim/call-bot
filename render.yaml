@@ -2,7 +2,7 @@ services:
   - type: web
     name: voice-patient-registration
     runtime: docker
-    plan: starter
+    plan: free
     healthCheckPath: /health
     envVars:
       - key: APP_ENV
@@ -21,7 +21,3 @@ services:
         value: Elliot
       - key: VAPI_WEBHOOK_SECRET
         generateValue: true
-    disk:
-      name: patient-data
-      mountPath: /data
-      sizeGB: 1
