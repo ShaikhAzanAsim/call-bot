@@ -4,64 +4,198 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Intake desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Schibsted+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --ink: #1c1915;
-      --muted: #5c564c;
-      --line: #e4ddd2;
-      --paper: #f6f1e8;
-      --card: #fffdf8;
-      --good: #1f7a4d;
-      --bad: #9c2f2f;
-      --accent: #0f6e6b;
+      --wall: #e4eef3;
+      --chart: #f7fbfc;
+      --ink: #102830;
+      --mist: #5c7380;
+      --rule: #c5d6df;
+      --held: #0c7560;
+      --held-wash: #e5f5f0;
+      --correction: #b42318;
+      --correction-wash: #fdeceb;
+      --lamp: #d4922a;
+      --lamp-dim: #c5d0d6;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font: 16px/1.45 "Segoe UI", Georgia, sans-serif;
+      min-height: 100vh;
       color: var(--ink);
-      background: var(--paper);
+      background:
+        radial-gradient(900px 420px at 0% -10%, #f8fbfc 0%, transparent 60%),
+        var(--wall);
+      font: 16px/1.45 Figtree, "Segoe UI", sans-serif;
     }
-    header, main { max-width: 1100px; margin: 0 auto; padding: 24px; }
-    header { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; }
-    h1 { font-size: 28px; margin: 0; letter-spacing: -0.03em; }
-    h2 { font-size: 18px; margin: 0 0 12px; }
-    a { color: var(--accent); }
-    .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; }
-    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+    a { color: var(--ink); }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--lamp); outline-offset: 3px; }
+    header, main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      padding: 28px 0 18px;
+    }
+    .eyebrow {
+      margin: 0 0 6px;
+      font: 600 12px/1 "Schibsted Grotesk", Figtree, sans-serif;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+    h1 {
+      margin: 0;
+      font: 700 40px/0.95 "Schibsted Grotesk", Figtree, sans-serif;
+      letter-spacing: -0.045em;
+    }
+    .lede { margin: 8px 0 0; max-width: 42ch; color: var(--mist); }
+    .line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px 8px 8px;
+      background: var(--chart);
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+    }
+    .lamp {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--lamp-dim);
+      box-shadow: inset 0 0 0 3px #edf3f6;
+    }
+    .lamp.lit {
+      background: var(--lamp);
+      box-shadow: 0 0 0 4px rgba(212, 146, 42, 0.22);
+      animation: glow 1.6s ease-in-out infinite;
+    }
+    .line strong { font: 650 14px/1 "Schibsted Grotesk", Figtree, sans-serif; }
+    .api {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--mist);
+    }
+    main { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 16px; padding-bottom: 40px; }
+    .card {
+      background: var(--chart);
+      border: 1px solid var(--rule);
+      border-radius: 18px;
+      padding: 18px 18px 8px;
+      box-shadow: 0 1px 0 rgba(16, 40, 48, 0.04);
+    }
+    .card h2 {
+      margin: 0;
+      font: 650 18px/1 "Schibsted Grotesk", Figtree, sans-serif;
+      letter-spacing: -0.03em;
+    }
+    .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .meta { margin: 0 0 12px; color: var(--mist); font-size: 14px; }
+    .pill {
+      border-radius: 999px;
+      padding: 4px 9px;
+      background: #e7eef2;
+      color: var(--mist);
+      font: 600 12px/1 Figtree, sans-serif;
+      text-transform: lowercase;
+    }
+    .pill.in_progress { background: #f8edd8; color: #8a5a10; }
+    .pill.completed { background: var(--held-wash); color: var(--held); }
+    .pill.failed, .pill.abandoned { background: var(--correction-wash); color: var(--correction); }
+    .field {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 11px 0;
+      border-top: 1px solid var(--rule);
+    }
+    .field span:first-child { text-transform: capitalize; }
+    .ok { color: var(--held); font-weight: 650; }
+    .bad { color: var(--correction); font-weight: 650; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    .field { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
-    .ok { color: var(--good); }
-    .bad { color: var(--bad); }
-    .muted { color: var(--muted); }
-    .pill { display: inline-block; border-radius: 999px; padding: 2px 8px; background: #efe7da; font-size: 12px; }
-    #timeline { font-family: ui-monospace, Consolas, monospace; font-size: 12px; white-space: pre-wrap; }
-    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+    th {
+      padding: 8px 6px;
+      text-align: left;
+      color: var(--mist);
+      font: 600 11px/1 Figtree, sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--rule);
+    }
+    td { padding: 12px 6px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+    .name { font-weight: 650; }
+    .tape { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 12px; }
+    .tick {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 10px;
+      padding: 8px 0;
+      border-top: 1px dashed var(--rule);
+      font: 12px/1.4 "IBM Plex Mono", Consolas, monospace;
+    }
+    .tick b { font-weight: 500; color: var(--ink); }
+    .tick span, .empty { color: var(--mist); }
+    @keyframes glow {
+      50% { box-shadow: 0 0 0 7px rgba(212, 146, 42, 0.08); }
+    }
+    @media (max-width: 800px) {
+      h1 { font-size: 32px; }
+      header { flex-direction: column; align-items: flex-start; }
+      main { grid-template-columns: 1fr; }
+      thead { display: none; }
+      table, tbody, tr, td { display: block; width: 100%; }
+      tr { padding: 12px 0; border-bottom: 1px solid var(--rule); }
+      td { border: 0; padding: 2px 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .lamp.lit { animation: none; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div>
+      <p class="eyebrow">Voice registration</p>
       <h1>Intake desk</h1>
-      <p class="muted">Fake patients only. Live calls fill the form as each field is accepted or rejected.</p>
+      <p class="lede">Watch a registration fill in while the caller is still on the phone. Every name here is fictional.</p>
     </div>
-    <a href="/docs">API docs</a>
+    <div>
+      <div class="line" id="line">
+        <span class="lamp" id="lamp" aria-hidden="true"></span>
+        <strong id="line-label">Line is quiet</strong>
+      </div>
+      <a class="api" href="/docs">Open the API docs</a>
+    </div>
   </header>
-  <main class="grid">
+  <main>
     <section class="card">
-      <h2>Patients</h2>
-      <table>
-        <thead><tr><th>Name</th><th>DOB</th><th>Phone</th><th>City</th></tr></thead>
-        <tbody id="patients"></tbody>
-      </table>
+      <div class="head">
+        <h2>This call</h2>
+        <span id="call-status" class="pill">idle</span>
+      </div>
+      <p id="call-meta" class="meta">Waiting for the phone to ring.</p>
+      <div id="fields"></div>
+      <div class="head" style="margin-top: 22px">
+        <h2>Flight recorder</h2>
+      </div>
+      <div id="timeline" class="tape"><p class="empty">No events yet.</p></div>
     </section>
     <section class="card">
-      <h2>Live call <span id="call-status" class="pill">idle</span></h2>
-      <p id="call-meta" class="muted">Waiting for a call.</p>
-      <div id="fields"></div>
-      <h2 style="margin-top:18px">Flight recorder</h2>
-      <div id="timeline" class="muted">No events yet.</div>
+      <div class="head">
+        <h2>Chart</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Date of birth</th><th>Phone</th><th>City</th></tr>
+        </thead>
+        <tbody id="patients"></tbody>
+      </table>
     </section>
   </main>
   <script>
@@ -70,8 +204,29 @@
     const timelineEl = document.querySelector("#timeline");
     const statusEl = document.querySelector("#call-status");
     const metaEl = document.querySelector("#call-meta");
+    const lampEl = document.querySelector("#lamp");
+    const lineLabel = document.querySelector("#line-label");
     const focus = new URLSearchParams(location.hash.slice(1)).get("call") || (location.hash.match(/call=([^&]+)/) || [])[1];
     let activeId = focus || null;
+    const lineCopy = {
+      idle: "Line is quiet",
+      in_progress: "On the line",
+      completed: "Record saved",
+      failed: "Save did not finish",
+      abandoned: "Caller hung up"
+    };
+
+    function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+      }[ch]));
+    }
+
+    function phone(value) {
+      const digits = String(value || "").replace(/\D/g, "");
+      if (digits.length === 10) return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+      return value || "";
+    }
 
     function renderDraft(draft, events) {
       const collected = (draft && draft.fields) || {};
@@ -81,19 +236,21 @@
       });
       const names = Object.keys({...collected, ...failed});
       fieldsEl.innerHTML = names.map((name) => {
+        const label = esc(name.replaceAll("_", " "));
         if (failed[name] && collected[name] == null) {
-          return `<div class="field"><span>${name.replaceAll("_", " ")}</span><span class="bad">rejected · step ${failed[name].repair_step}</span></div>`;
+          return `<div class="field"><span>${label}</span><span class="bad">Rejected, step ${esc(failed[name].repair_step)}</span></div>`;
         }
-        return `<div class="field"><span>${name.replaceAll("_", " ")}</span><span class="ok">${collected[name] || ""}</span></div>`;
-      }).join("") || `<p class="muted">No fields yet.</p>`;
+        const shown = name.includes("phone") ? phone(collected[name]) : collected[name];
+        return `<div class="field"><span>${label}</span><span class="ok">${esc(shown || "")}</span></div>`;
+      }).join("") || `<p class="empty">No fields yet. They appear as the caller answers.</p>`;
     }
 
     async function loadPatients() {
       const response = await fetch("/patients");
       const body = await response.json();
       patientsEl.innerHTML = (body.data || []).map((row) =>
-        `<tr><td>${row.first_name} ${row.last_name}</td><td>${row.date_of_birth}</td><td>${row.phone_number}</td><td>${row.city}, ${row.state}</td></tr>`
-      ).join("") || `<tr><td colspan="4" class="muted">No patients yet.</td></tr>`;
+        `<tr><td class="name">${esc(row.first_name)} ${esc(row.last_name)}</td><td>${esc(row.date_of_birth)}</td><td>${esc(phone(row.phone_number))}</td><td>${esc(row.city)}, ${esc(row.state)}</td></tr>`
+      ).join("") || `<tr><td colspan="4" class="empty">No patients on the chart.</td></tr>`;
     }
 
     async function loadCall(callId) {
@@ -103,11 +260,16 @@
       const call = body.data;
       activeId = call.call_id;
       statusEl.textContent = call.status;
-      metaEl.textContent = `${call.call_id} · ${call.caller_number || "unknown caller"}${call.summary ? " · " + call.summary : ""}`;
+      statusEl.className = `pill ${call.status || ""}`;
+      lampEl.classList.toggle("lit", call.status === "in_progress");
+      lineLabel.textContent = lineCopy[call.status] || call.status;
+      metaEl.textContent = `${call.call_id} · ${phone(call.caller_number) || "unknown caller"}${call.summary ? " · " + call.summary : ""}`;
       renderDraft(call.draft, call.events);
-      timelineEl.textContent = (call.events || []).map((event) =>
-        `${event.ts}  ${event.type}  ${JSON.stringify(event.payload)}`
-      ).join("\n") || "No events yet.";
+      const events = call.events || [];
+      timelineEl.innerHTML = events.map((event) => {
+        const clock = esc(String(event.ts || "").slice(11, 19));
+        return `<div class="tick"><span>${clock}</span><div><b>${esc(event.type)}</b><br><span>${esc(JSON.stringify(event.payload))}</span></div></div>`;
+      }).join("") || `<p class="empty">No events yet.</p>`;
     }
 
     async function pickCall() {
